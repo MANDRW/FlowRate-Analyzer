@@ -12,7 +12,7 @@ class ModelBuilder:
 
     def model(self):
         model= Sequential([
-            Conv2D(32, (3, 3), activation='relu', padding='same', input_shape=input_shape),
+            Conv2D(32, (3, 3), activation='relu', padding='same', input_shape=self.input_shape),
             BatchNormalization(),
             Conv2D(32, (3, 3), activation='relu', padding='same'),
             BatchNormalization(),
