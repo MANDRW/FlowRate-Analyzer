@@ -69,21 +69,22 @@ class DataPrep:
         labels = np.array(labels)
         return images, labels
 
-    def prep(self,augment=True):
-        images, labels = self.load()
+    def prep(self,augment=True,crop=False):
+        images, labels = self.load(crop)
         x_train, x_val, y_train, y_val = train_test_split(images, labels, test_size=self.test_size, random_state=self.random_state, stratify=labels)
         y_train = to_categorical(y_train, num_classes=3)
         y_val = to_categorical(y_val, num_classes=3)
         if(augment==True):
             train_datagen = ImageDataGenerator(
                 rotation_range=20,
-                width_shift_range=0.2,
-                height_shift_range=0.2,
-                shear_range=0.2,
+                width_shift_range=0.1,
+                height_shift_range=0.1,
+                #shear_range=0.2,
                 zoom_range=0.2,
                 horizontal_flip=True,
-                vertical_flip=True,
-                fill_mode='nearest'
+                #vertical_flip=True,
+                fill_mode='nearest',
+                brightness_range = (0.8, 1.2)
             )
         else:
             train_datagen = ImageDataGenerator()
@@ -92,18 +93,3 @@ class DataPrep:
         train_gen = train_datagen.flow(x_train, y_train, batch_size=self.batch_size)
         val_gen= val_datagen.flow(x_val, y_val, batch_size=self.batch_size)
         return train_gen, val_gen
-
-
-if __name__ == "__main__":
-    path = "far_flowrate_dataset"
-    img_size = (4032//6, 3024//6)  # Resize images to 672x504
-    batch_size = 16
-    test_size = 0.2
-    random_state = 42
-    crop_ratio=0.5
-
-    data_prep = DataPrep(path, img_size, batch_size, test_size, random_state,crop_ratio)
-    train_gen, val_gen = data_prep.prep(augment=True)
-
-    images, labels = data_prep.load(True)
-    samples(images, labels, quantity=9)
