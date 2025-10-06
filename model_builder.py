@@ -1,0 +1,31 @@
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+
+
+class ModelBuilder:
+    def __init__(self, input_shape=(672,504,3),num_classes=3):
+        self.input_shape = input_shape
+        self.num_classes = num_classes
+
+    def model(self):
+        model= Sequential([
+            Conv2D(32, (3, 3), activation='relu', input_shape=self.input_shape),
+            MaxPooling2D((2, 2)),
+            Conv2D(64, (3, 3), activation='relu'),
+            MaxPooling2D((2, 2)),
+            Dropout(0.25),
+            Conv2D(128, (3, 3), activation='relu'),
+            MaxPooling2D((2, 2)),
+            Conv2D(128, (3, 3), activation='relu'),
+            MaxPooling2D((2, 2)),
+            Flatten(),
+            Dense(128, activation='relu'),
+            Dropout(0.25),
+            Dense(self.num_classes, activation='softmax')
+        ]
+        )
+        model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+        return model
+
+
+

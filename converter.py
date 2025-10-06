@@ -10,7 +10,7 @@ def converter(input_img, output_folder, id, type):
     os.rename(converted_img_path, os.path.join(output_folder, f"{id}_{type}.png"))
 
 if __name__ == "__main__":
-    folder_type_path="close" # far or close
+    folder_type_path="far" # far or close
     img_type_path="good" # under or good or over
     input_folder=(f"{folder_type_path}/{img_type_path}")
     output_folder=(f"{folder_type_path}/{img_type_path}_png")
