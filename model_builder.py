@@ -33,7 +33,7 @@ class ModelBuilder:
             GlobalAveragePooling2D(),
             Dense(256, activation='relu'),
             Dropout(0.5),
-            Dense(num_classes, activation='softmax')
+            Dense(self.num_classes, activation='softmax')
         ]
         )
         optimazer=Adam(learning_rate=0.0001)
