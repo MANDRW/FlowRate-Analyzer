@@ -71,14 +71,15 @@ class DataPrep:
         y_val = to_categorical(y_val, num_classes=3)
         if augment:
             train_datagen = ImageDataGenerator(
-                rotation_range=2.5,#5
-                width_shift_range=0.1, #0.15
-                height_shift_range=0.01,
-                shear_range=2,
+                rotation_range=5,#5
+                width_shift_range=0.2, #0.15
+                height_shift_range=0.2,
+                shear_range=5,
                 horizontal_flip=True,
                 vertical_flip=True,
                 fill_mode='reflect',
-                rescale=1. / 255.0
+                rescale=1. / 255.0,
+                zoom_range=0.2
             )
         else:
             train_datagen = ImageDataGenerator()

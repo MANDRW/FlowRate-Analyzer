@@ -2,13 +2,13 @@ import preparing
 import model_builder
 import coach
 def main():
-    path = "close_flowrate_dataset"
+    path = "far_flowrate_dataset"
     img_size = (4032 // 8, 3024 // 8)
     batch_size = 16
     test_size = 0.2
     random_state = 42
-    crop_ratio = 0.99
-    name="newer_close_1"
+    crop_ratio = 0.5
+    name="newer_far_1"
 
     data_prep = preparing.DataPrep(path, img_size, batch_size, test_size, random_state, crop_ratio)
     train_gen, val_gen = data_prep.prep(augment=True, crop=True)
