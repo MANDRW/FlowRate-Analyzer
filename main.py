@@ -3,7 +3,7 @@ import model_builder
 import coach
 def main():
     path = "close_flowrate_dataset"
-    img_size = (4032 // 14, 3024 // 14)
+    img_size = (4032 // 8, 3024 // 8)
     batch_size = 16
     test_size = 0.2
     random_state = 42
