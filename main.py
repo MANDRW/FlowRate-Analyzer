@@ -7,7 +7,7 @@ def main():
     batch_size = 16
     test_size = 0.2
     random_state = 42
-    crop_ratio = 0.1
+    crop_ratio = 0.99
     name="newer_close_1"
 
     data_prep = preparing.DataPrep(path, img_size, batch_size, test_size, random_state, crop_ratio)
