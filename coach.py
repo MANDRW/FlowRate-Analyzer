@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from keras.callbacks import ReduceLROnPlateau
 from tensorflow.python.keras.utils.version_utils import callbacks
 
 
@@ -15,7 +16,7 @@ class Coach:
             self.train_data,
             validation_data=self.val_data,
             epochs=self.epochs,
-            callbacks=[callbacks.EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)]
+            callbacks=[callbacks.EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True),ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=3, min_lr=1e-7)]
         )
         if(save):
             self.model.save("models/"+self.name+".h5")
