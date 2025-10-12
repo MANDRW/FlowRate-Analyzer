@@ -15,7 +15,7 @@ class Coach:
             self.train_data,
             validation_data=self.val_data,
             epochs=self.epochs,
-            callbacks=[callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)]
+            callbacks=[callbacks.EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)]
         )
         if(save):
             self.model.save("models/"+self.name+".h5")

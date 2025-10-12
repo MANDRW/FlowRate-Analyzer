@@ -1,6 +1,4 @@
 import os
-from fileinput import filename
-
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 from tensorflow.keras.utils import load_img, to_categorical
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -10,9 +8,8 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from PIL import Image
 
-
 def samples(images, labels, quantity=9):
-    plt.figure(figsize=(10, 10))
+    plt.figure(figsize=(12, 16))
     for i in range(quantity):
         idx = rand.randint(0, len(images) - 1)
         plt.subplot(3, 3, i + 1)
@@ -20,8 +17,6 @@ def samples(images, labels, quantity=9):
         plt.title(f"Klasa: {labels[idx]}")
         plt.axis("off")
     plt.show()
-
-
 
 class DataPrep:
     def __init__(self,path,img_size=(512,512),batch_size=32,test_size=0.2,random_state=42,crop_ratio=0.5):
@@ -74,17 +69,16 @@ class DataPrep:
         x_train, x_val, y_train, y_val = train_test_split(images, labels, test_size=self.test_size, random_state=self.random_state, stratify=labels)
         y_train = to_categorical(y_train, num_classes=3)
         y_val = to_categorical(y_val, num_classes=3)
-        if(augment==True):
+        if augment:
             train_datagen = ImageDataGenerator(
-                rotation_range=20,
-                width_shift_range=0.1,
-                height_shift_range=0.1,
-                #shear_range=0.2,
-                zoom_range=0.2,
+                rotation_range=2.5,#5
+                width_shift_range=0.1, #0.15
+                height_shift_range=0.01,
+                shear_range=2,
                 horizontal_flip=True,
-                #vertical_flip=True,
-                fill_mode='nearest',
-                brightness_range = (0.8, 1.2)
+                vertical_flip=True,
+                fill_mode='reflect',
+                rescale=1. / 255.0
             )
         else:
             train_datagen = ImageDataGenerator()
@@ -93,3 +87,22 @@ class DataPrep:
         train_gen = train_datagen.flow(x_train, y_train, batch_size=self.batch_size)
         val_gen= val_datagen.flow(x_val, y_val, batch_size=self.batch_size)
         return train_gen, val_gen
+
+
+if __name__ == "__main__":
+
+    path = "close_flowrate_dataset"
+    img_size = (4032//6, 3024//6)
+    batch_size = 16
+    test_size = 0.2
+    random_state = 42
+    crop_ratio=0.99 #0.6
+
+
+    data_prep = DataPrep(path, img_size, batch_size, test_size, random_state,crop_ratio)
+
+    train_gen, val_gen = data_prep.prep(augment=True,crop=True)
+
+    x_batch, y_batch = next(train_gen)
+
+    samples(x_batch, y_batch, quantity=9)
