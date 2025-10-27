@@ -72,7 +72,7 @@ class DataPrep:
         if augment:
             train_datagen = ImageDataGenerator(
                 rotation_range=5,#5
-                width_shift_range=0.2, #0.15
+                width_shift_range=0.15, #0.2
                 height_shift_range=0.2,
                 shear_range=5,
                 horizontal_flip=True,
