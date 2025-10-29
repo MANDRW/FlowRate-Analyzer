@@ -1,8 +1,10 @@
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.layers import GlobalAveragePooling2D
+from tensorflow.python.keras.layers import GlobalMaxPooling2D
 from tensorflow.python.keras.legacy_tf_layers.core import dropout
 
 
@@ -11,7 +13,7 @@ class ModelBuilder:
         self.input_shape = input_shape
         self.num_classes = num_classes
 
-    def model(self):
+    def model2(self):
         model = Sequential([
             Conv2D(32, (3, 3), activation='relu', padding='same', input_shape=self.input_shape),
             Conv2D(32, (3, 3), activation='relu', padding='same'),
@@ -28,12 +30,28 @@ class ModelBuilder:
             MaxPooling2D(2, 2),
 
             Flatten(),
-            Dense(128, activation='relu'),
+            Dense(256, activation='relu'),
             Dropout(0.6),
             Dense(3, activation='softmax')
         ])
-        optimazer = Adam(learning_rate=0.00001)
-        model.compile(optimizer=optimazer, loss='categorical_crossentropy', metrics=['accuracy'])
+        optimizer = Adam(learning_rate=0.00001)
+        model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+        return model
+
+    def model(self):
+        model = Sequential([
+            Conv2D(180,(5, 5),
+                activation='linear',
+                input_shape=self.input_shape,
+                padding='valid'
+            ),
+            Flatten(),
+            Dense(256, activation='relu'),
+            Dropout(0.25),
+            Dense(3, activation='softmax')
+        ])
+        optimizer = Adam(learning_rate=0.00001)
+        model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
         return model
 
 
