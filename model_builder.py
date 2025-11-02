@@ -42,8 +42,8 @@ class ModelBuilder:
         model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
         return model
 
-    def texture_mobilenet(input_shape=(224, 224, 3), num_classes=3):
-        base = MobileNetV2(weights='imagenet', include_top=False, input_shape=input_shape)
+    def texture_mobilenet(self):
+        base = MobileNetV2(weights='imagenet', include_top=False, input_shape=self.input_shape)
         for layer in base.layers[:80]:
             layer.trainable = False
 
@@ -51,7 +51,7 @@ class ModelBuilder:
         x = GlobalAveragePooling2D()(x)
         x = Dropout(0.4)(x)
         x = Dense(128, activation='relu')(x)
-        output = Dense(num_classes, activation='softmax')(x)
+        output = Dense(self.num_classes, activation='softmax')(x)
 
         model = Model(inputs=base.input, outputs=output)
         model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
