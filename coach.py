@@ -31,19 +31,23 @@ class Coach:
         plt.ylabel('Accuracy')
         plt.show()
 
+    def save_history_to_json(self, history=None):
 
-    def save_history_to_json(self):
-        if self.history is None:
-            return
+        hist = history if history is not None else self.history
+        if hist is None:
+            raise ValueError("Brak historii treningu. Najpierw wywołaj train() lub przekaż history jako argument.")
+
         history_data = {
-            "loss": [float(l) for l in self.history.history['loss']],
-            "accuracy": [float(a) for a in self.history.history['accuracy']],
-            "val_loss": [float(l) for l in self.history.history['val_loss']],
-            "val_accuracy": [float(a) for a in self.history.history['val_accuracy']],
+            "loss": [float(l) for l in hist.history['loss']],
+            "accuracy": [float(a) for a in hist.history['accuracy']],
+            "val_loss": [float(l) for l in hist.history['val_loss']],
+            "val_accuracy": [float(a) for a in hist.history['val_accuracy']],
             "model_name": self.name
         }
+
         json_path = f"{self.name}.json"
         with open(json_path, "w") as f:
+            import json
             json.dump(history_data, f, indent=4)
 
     @staticmethod
