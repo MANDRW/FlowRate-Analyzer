@@ -7,6 +7,7 @@ import random as rand
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from PIL import Image
+from sklearn.model_selection import KFold
 
 def samples(images, labels, quantity=9):
     plt.figure(figsize=(12, 16))
@@ -89,21 +90,35 @@ class DataPrep:
         val_gen= val_datagen.flow(x_val, y_val, batch_size=self.batch_size)
         return train_gen, val_gen
 
+    def get_folds(self, num_folds=5, augment=True, crop=False):
+        images, labels = self.load(crop=crop)
+        num_classes = len(np.unique(labels))
+        kf = KFold(n_splits=num_folds, shuffle=True, random_state=self.random_state)
+        folds = []
 
-if __name__ == "__main__":
+        for train_idx, val_idx in kf.split(images, labels):
+            x_train, x_val = images[train_idx], images[val_idx]
+            y_train, y_val = labels[train_idx], labels[val_idx]
+            y_train = to_categorical(y_train, num_classes=num_classes)
+            y_val = to_categorical(y_val, num_classes=num_classes)
 
-    path = "close_flowrate_dataset"
-    img_size = (4032//6, 3024//6)
-    batch_size = 16
-    test_size = 0.2
-    random_state = 42
-    crop_ratio=0.99 #0.6
+            train_datagen = ImageDataGenerator(
+                rotation_range=5,
+                width_shift_range=0.15,
+                height_shift_range=0.2,
+                shear_range=5,
+                horizontal_flip=True,
+                vertical_flip=True,
+                fill_mode='reflect',
+                zoom_range=0.2
+            ) if augment else ImageDataGenerator()
 
+            val_datagen = ImageDataGenerator()
 
-    data_prep = DataPrep(path, img_size, batch_size, test_size, random_state,crop_ratio)
+            train_gen = train_datagen.flow(x_train, y_train, batch_size=self.batch_size)
+            val_gen = val_datagen.flow(x_val, y_val, batch_size=self.batch_size)
 
-    train_gen, val_gen = data_prep.prep(augment=True,crop=True)
+            folds.append((train_gen, val_gen))
 
-    x_batch, y_batch = next(train_gen)
+        return folds
 
-    samples(x_batch, y_batch, quantity=9)
