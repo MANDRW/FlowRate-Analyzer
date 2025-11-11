@@ -11,26 +11,26 @@ import coach
 
 def main():
     set_global_policy('mixed_float16')
-    path = "all_rotate_dataset"
-    img_size = (224,224) #(4032 // 10, 3024 // 10)
+    PATH = "all_rotate_dataset"
+    IMG_SIZE = (224,224)
     batch_size = 8
     test_size = 0.3
     random_state = 42
     crop_ratio = 1
-    name_prefix = "mobilenet_texture_kfold"
+    name_prefix = "model_kfold"
     num_folds = 5
     epochs = 50
 
-    data_prep = preparing.DataPrep(path, img_size, batch_size)
+    data_prep = preparing.DataPrep(PATH, IMG_SIZE, batch_size)
     folds_data = data_prep.get_folds(num_folds=num_folds, augment=True)
 
     all_scores = []
 
     for fold_no, (train_gen, val_gen) in enumerate(folds_data, 1):
-        builder = model_builder.ModelBuilder(input_shape=(img_size[0], img_size[1], 3), num_classes=3)
-        model = builder.texture_mobilenet()
+        builder = model_builder.ModelBuilder(input_shape=(IMG_SIZE[0], IMG_SIZE[1], 3), num_classes=3)
+        model = builder.model()
         coach_instance = coach.Coach(model, train_gen, val_gen, epochs=epochs, name=f"{name_prefix}_fold{fold_no}")
-        history = coach_instance.train(save=True)
+        history = coach_instance.train()
         score = model.evaluate(val_gen)
         all_scores.append(score[1])
         coach_instance.save_history_to_json(history)

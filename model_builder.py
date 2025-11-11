@@ -1,5 +1,6 @@
+from cv2.datasets import none
 from keras import Model
-from keras.applications import MobileNetV2
+from keras.applications import MobileNetV2, VGG16, VGG19
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from tensorflow.keras.optimizers import Adam
@@ -19,55 +20,43 @@ class ModelBuilder:
 
     def model(self):
         model = Sequential([
-            Conv2D(32, (3, 3), activation='relu', padding='same', input_shape=self.input_shape),
-            Conv2D(32, (3, 3), activation='relu', padding='same'),
+            Conv2D(32, (3, 3), padding='same', input_shape=self.input_shape),
             BatchNormalization(),
-            MaxPooling2D(2, 2),
-
-            Conv2D(64, (3, 3), activation='relu', padding='same'),
-            Conv2D(64, (3, 3), activation='relu', padding='same'),
+            Activation('relu'),
+            MaxPooling2D((2, 2)),
+            Conv2D(64, (3, 3), padding='same'),
             BatchNormalization(),
-            MaxPooling2D(2, 2),
-
-            Conv2D(128, (3, 3), activation='relu', padding='same'),
+            Activation('relu'),
+            MaxPooling2D((2, 2)),
+            Conv2D(128, (3, 3), padding='same'),
             BatchNormalization(),
-            MaxPooling2D(2, 2),
-
+            Activation('relu'),
+            MaxPooling2D((2, 2)),
             Flatten(),
-            Dense(256, activation='relu'),
-            Dropout(0.6),
-            Dense(3, activation='softmax')
+            Dense(128, activation='relu'),
+            Dense(self.num_classes, activation='softmax')
         ])
-        optimizer = Adam(learning_rate=0.00001)
-        model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+
+        optimizer = Adam(learning_rate=1e-4)
+        model.compile(optimizer=optimizer,
+                      loss='categorical_crossentropy',
+                      metrics=['accuracy'])
         return model
 
-    def texture_mobilenet(self):
-        base = MobileNetV2(weights='imagenet', include_top=False, input_shape=self.input_shape)
-        for layer in base.layers[:80]:
-            layer.trainable = False
 
-        x = base.output
-        x = GlobalAveragePooling2D()(x)
-        x = Dropout(0.4)(x)
-        x = Dense(128, activation='relu')(x)
-        output = Dense(self.num_classes, activation='softmax')(x)
+    def mobilenet(self):
+            base = MobileNetV2(weights='imagenet', include_top=False, input_shape=self.input_shape)
+            for layer in base.layers[:80]:
+                layer.trainable = False
 
-        model = Model(inputs=base.input, outputs=output)
-        model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-        return model
+            x = base.output
+            x = GlobalAveragePooling2D()(x)
+            x = Dropout(0.4)(x)
+            x = Dense(128, activation='relu')(x)
+            output = Dense(self.num_classes, activation='softmax')(x)
 
-    def texture_net(input_shape=(128, 128, 3), num_classes=3):
-        inp = Input(shape=input_shape)
-        x1 = Conv2D(32, (3, 3), activation='relu', padding='same')(inp)
-        x2 = Conv2D(32, (5, 5), activation='relu', padding='same')(inp)
-        x3 = Conv2D(32, (7, 7), activation='relu', padding='same')(inp)
+            model = Model(inputs=base.input, outputs=output)
+            model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+            return model
 
-        merged = concatenate([x1, x2, x3])
-        pooled = GlobalAveragePooling2D()(merged)
-        out = Dense(num_classes, activation='softmax')(pooled)
-
-        model = Model(inp, out)
-        model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-        return model
 

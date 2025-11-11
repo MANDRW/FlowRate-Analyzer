@@ -11,7 +11,7 @@ class Coach:
         self.epochs = epochs
         self.name = name
 
-    def train(self,save=False):
+    def train(self):
         history = self.model.fit(
             self.train_data,
             validation_data=self.val_data,
@@ -20,8 +20,8 @@ class Coach:
                        ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=4, min_lr=1e-6),
                        ModelCheckpoint(f"models/{self.name}.h5", monitor='val_loss', save_best_only=True)]
         )
-        if(save):
-            self.model.save("models/"+self.name+".h5")
+
+        self.model.save("models/"+self.name+".h5")
         return history
 
     def accuracy(self, history):
