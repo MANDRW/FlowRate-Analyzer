@@ -15,13 +15,13 @@ from tensorflow.keras.utils import to_categorical
 
 
 
-MODELS = "mobilenet_texture_kfold_fold"
+MODEL_PATH = "models/mobilenet_fold"
 NUM_FOLDS = 5
 
 CLASS_NAMES = ['Under', 'Good', 'Over']
 CLASS_LABELS = ['100-under', '010-good', '001-over']
 
-DATA_PATH = "all_dataset"
+DATA_PATH = "../all_dataset"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 8
 RANDOM_STATE = 42
@@ -192,7 +192,7 @@ def evaluate_all_folds():
     print("="*80)
 
     import sys
-    sys.path.append('/mnt/user-data/uploads')
+    sys.path.append('/Users\MatAnd\Github\FlowRateAnalyzer')
     import preparing
 
     data_prep = preparing.DataPrep(
@@ -213,7 +213,7 @@ def evaluate_all_folds():
         print(f"# FOLD {fold_no}/{NUM_FOLDS}")
         print(f"{'#'*80}\n")
 
-        model_path = f"models/mobilenet_0_9258/{MODELS}{fold_no}.h5"
+        model_path = f"{MODEL_PATH}{fold_no}.h5"
         if not os.path.exists(model_path):
             print(f"Model nie znaleziony: {model_path}")
             print(f"Sprawdź ścieżkę lub pomiń ten fold")
@@ -294,7 +294,7 @@ def evaluate_all_folds():
                 'accuracy': float(metrics['accuracy'])
             })
         
-        with open('/outputs/detailed_metrics.json', 'w') as f:
+        with open('../outputs/detailed_metrics.json', 'w') as f:
             json.dump(results, f, indent=4)
         
         print("\n✓ Wszystkie wyniki zapisane w /mnt/user-data/outputs/")

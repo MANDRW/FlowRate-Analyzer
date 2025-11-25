@@ -1,15 +1,17 @@
 import json
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
 
 class Coach:
-    def __init__(self, model, train_data, val_data, epochs=50,name="model"):
+    def __init__(self, model, train_data, val_data, epochs=50,name="model",name_prefix="model"):
         self.model = model
         self.train_data = train_data
         self.val_data = val_data
         self.epochs = epochs
         self.name = name
+        self.name_prefix = name_prefix
 
     def train(self):
         history = self.model.fit(
@@ -17,11 +19,9 @@ class Coach:
             validation_data=self.val_data,
             epochs=self.epochs,
             callbacks=[EarlyStopping(monitor='val_loss', patience=8, restore_best_weights=True),
-                       ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=4, min_lr=1e-6),
-                       ModelCheckpoint(f"models/{self.name}.h5", monitor='val_loss', save_best_only=True)]
+                       ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=3, min_lr=1e-6),
+                       ModelCheckpoint(f"models/{self.name_prefix}/{self.name}.h5", monitor='val_loss', save_best_only=True)]
         )
-
-        self.model.save("models/"+self.name+".h5")
         return history
 
     def accuracy(self, history):
@@ -45,7 +45,9 @@ class Coach:
             "model_name": self.name
         }
 
-        json_path = f"{self.name}.json"
+        json_path = f"json/{self.name_prefix}/{self.name}.json"
+        os.makedirs(os.path.dirname(json_path), exist_ok=True)
+
         with open(json_path, "w") as f:
             import json
             json.dump(history_data, f, indent=4)

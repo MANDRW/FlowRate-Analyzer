@@ -34,7 +34,7 @@ class ModelBuilder:
             MaxPooling2D((2, 2)),
             Flatten(),
             Dense(128, activation='relu'),
-            Dense(self.num_classes, activation='softmax')
+            Dense(3, activation='softmax')
         ])
 
         optimizer = Adam(learning_rate=1e-4)

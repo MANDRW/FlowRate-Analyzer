@@ -11,13 +11,14 @@ import coach
 
 def main():
     set_global_policy('mixed_float16')
-    PATH = "all_rotate_dataset"
+    PATH = "all_dataset"
     IMG_SIZE = (224,224)
     batch_size = 8
     test_size = 0.3
     random_state = 42
     crop_ratio = 1
-    name_prefix = "model_kfold"
+    name_prefix = "model_final"
+    model_type= "model" #mobilenet
     num_folds = 5
     epochs = 50
 
@@ -28,8 +29,11 @@ def main():
 
     for fold_no, (train_gen, val_gen) in enumerate(folds_data, 1):
         builder = model_builder.ModelBuilder(input_shape=(IMG_SIZE[0], IMG_SIZE[1], 3), num_classes=3)
-        model = builder.model()
-        coach_instance = coach.Coach(model, train_gen, val_gen, epochs=epochs, name=f"{name_prefix}_fold{fold_no}")
+        if model_type == "mobilenet":
+            model = builder.mobilenet()
+        else:
+            model = builder.model()
+        coach_instance = coach.Coach(model, train_gen, val_gen, epochs=epochs, name=f"{name_prefix}_fold{fold_no}", name_prefix=name_prefix)
         history = coach_instance.train()
         score = model.evaluate(val_gen)
         all_scores.append(score[1])

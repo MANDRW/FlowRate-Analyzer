@@ -5,7 +5,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import numpy as np
 import random as rand
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, StratifiedKFold
 from PIL import Image
 from sklearn.model_selection import KFold
 
@@ -20,7 +20,7 @@ def samples(images, labels, quantity=9):
     plt.show()
 
 class DataPrep:
-    def __init__(self,path,img_size=(512,512),batch_size=32,test_size=0.2,random_state=42,crop_ratio=0.5):
+    def __init__(self,path,img_size=(224,224),batch_size=8,test_size=0.3,random_state=42,crop_ratio=0.5):
         self.path = path
         self.img_size = img_size
         self.batch_size = batch_size
@@ -79,7 +79,6 @@ class DataPrep:
                 horizontal_flip=True,
                 vertical_flip=True,
                 fill_mode='reflect',
-                rescale=1. / 255.0,
                 zoom_range=0.2
             )
         else:
@@ -93,7 +92,11 @@ class DataPrep:
     def get_folds(self, num_folds=5, augment=True, crop=False):
         images, labels = self.load(crop=crop)
         num_classes = len(np.unique(labels))
-        kf = KFold(n_splits=num_folds, shuffle=True, random_state=self.random_state)
+        kf = StratifiedKFold(
+            n_splits=num_folds,
+            shuffle=True,
+            random_state=self.random_state
+        )
         folds = []
 
         for train_idx, val_idx in kf.split(images, labels):
