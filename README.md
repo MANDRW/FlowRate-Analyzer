@@ -34,12 +34,15 @@ The project includes a complete pipeline: dataset preparation, model training, e
 - **Environment:** CUDA-accelerated GPU training (NVIDIA)
 
 ## Repository Structure
-├── main.py # Main training script
-├── preparing.py # Dataset loading & preprocessing
-├── model_builder.py # CNN + MobileNetV2 architectures
-├── coach.py # Training pipeline & callbacks
-├── test.py # Model evaluation script
-└── tools/ # Helper utilities
+
+├── main.py                 # Main training script
+├── preparing.py            # Dataset loading & preprocessing
+├── model_builder.py        # CNN + MobileNetV2 architectures
+├── coach.py                # Training pipeline & callbacks
+├── test.py                 # Model evaluation script
+├── tools/                  # Helper utilities
+└── README.md               # Project documentation
+
 
 ## Author
 
