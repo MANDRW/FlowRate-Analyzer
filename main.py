@@ -27,6 +27,7 @@ def main():
 
     all_scores = []
 
+
     for fold_no, (train_gen, val_gen) in enumerate(folds_data, 1):
         builder = model_builder.ModelBuilder(input_shape=(IMG_SIZE[0], IMG_SIZE[1], 3), num_classes=3)
         if model_type == "mobilenet":

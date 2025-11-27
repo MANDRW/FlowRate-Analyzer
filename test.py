@@ -4,14 +4,16 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.utils import load_img, img_to_array
 
 
-MODEL_PATH = "models/mobilenet_0_9258/mobilenet_texture_kfold_fold1.h5"
-IMAGE_PATH = "1_100.png"
+MODEL_PATH = "models/mobilenet_pp/mobilenet_pp_fold5.h5"
+IMAGE_PATH = "test_001.png"
 IMG_SIZE = (224, 224)
+TYPE = "mobilenet"
 
 CLASS_NAMES = ["Under", "Good", "Over"]
 
 
 def load_and_prepare_image(path, img_size):
+
     img = load_img(path, target_size=img_size)
     arr = img_to_array(img) / 255.0
     arr = np.expand_dims(arr, axis=0)
@@ -36,9 +38,12 @@ def predict_and_show():
     plt.title(
         f"Predykcja: {predicted_label}\n"
         f"Pewność: {confidence*100:.2f}%\n"
-        f"Nazwa: {IMAGE_PATH}   Raw: {np.round(pred, 4)}",
-        fontsize=12
+        #f"Nazwa: {IMAGE_PATH}   Raw: {np.round(pred, 4)}",
+        #fontsize=12
     )
+    save_path = f"pred_{TYPE}_{IMAGE_PATH}"
+
+    plt.savefig(save_path, bbox_inches='tight', dpi=300)
     plt.show()
 
     print("\n===== WYNIK =====")
