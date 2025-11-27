@@ -11,10 +11,6 @@ from tensorflow.keras.utils import to_categorical
 
 import preparing
 
-# =========================================================
-# KONFIGURACJA
-# =========================================================
-
 NUM_FOLDS = 5
 RANDOM_STATE = 42
 CLASS_NAMES = ["Under", "Good", "Over"]
@@ -36,9 +32,6 @@ os.makedirs(OUTPUT_CM, exist_ok=True)
 os.makedirs(OUTPUT_LC, exist_ok=True)
 
 
-# =========================================================
-# ŁADOWANIE DANYCH FOLDA
-# =========================================================
 
 def load_validation_data_for_fold(fold_no, data_prep):
     images, labels = data_prep.load(crop=False)
@@ -56,10 +49,6 @@ def load_validation_data_for_fold(fold_no, data_prep):
     return None, None, None
 
 
-# =========================================================
-# RYSOWANIE CONFUSION MATRIX
-# =========================================================
-
 def plot_conf_matrix(cm, fold_no):
     plt.figure(figsize=(6, 5))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
@@ -76,9 +65,6 @@ def plot_conf_matrix(cm, fold_no):
     print(f"✓ Zapisano CM fold {fold_no}: {path}")
 
 
-# =========================================================
-# RYSOWANIE LEARNING CURVES
-# =========================================================
 
 def plot_learning_curves(fold_no, history):
     loss = history["loss"]
@@ -116,9 +102,7 @@ def plot_learning_curves(fold_no, history):
     print(f"✓ Zapisano learning curve fold {fold_no}: {path}")
 
 
-# =========================================================
-# GŁÓWNA FUNKCJA
-# =========================================================
+
 
 def evaluate_all_folds():
 
@@ -130,33 +114,30 @@ def evaluate_all_folds():
     )
 
     all_metrics = []
-    all_cms = []   # <--- TU ZBIERAMY WSZYSTKIE MACIERZE
+    all_cms = []
 
     for fold in range(1, NUM_FOLDS + 1):
         print(f"\n========== FOLD {fold} ==========")
 
-        # 1. Wczytaj model
         model_path = os.path.join(MODEL_DIR, f"{MODEL}{fold}.h5")
         if not os.path.exists(model_path):
-            print(f"❌ Brak modelu: {model_path}")
+            print(f"Brak modelu: {model_path}")
             continue
 
         model = load_model(model_path)
         print(f"✓ Wczytano model: {model_path}")
 
-        # 2. Wczytaj dane
+
         x_val, y_val, y_val_cat = load_validation_data_for_fold(fold, data_prep)
 
-        # 3. Ewaluacja
+
         loss, acc = model.evaluate(x_val, y_val_cat, verbose=0)
         y_pred = np.argmax(model.predict(x_val, verbose=0), axis=1)
 
-        # Confusion matrix
         cm = confusion_matrix(y_val, y_pred)
         plot_conf_matrix(cm, fold)
         all_cms.append(cm)
 
-        # Makro metryki
         precision_macro = precision_score(y_val, y_pred, average="macro")
         recall_macro = recall_score(y_val, y_pred, average="macro")
         f1_macro = f1_score(y_val, y_pred, average="macro")
@@ -175,19 +156,16 @@ def evaluate_all_folds():
         print(f"Recall macro:    {recall_macro:.4f}")
         print(f"F1 macro:        {f1_macro:.4f}")
 
-        # 4. Learning curves z JSON
         json_path = os.path.join(JSON_DIR, f"{MODEL}{fold}.json")
         if os.path.exists(json_path):
             with open(json_path, "r") as f:
                 history = json.load(f)
             plot_learning_curves(fold, history)
         else:
-            print(f"⚠ Brak JSON treningowego: {json_path}")
+            print(f"Brak JSON treningowego: {json_path}")
 
 
-    # =========================================================
-    # ŚREDNIA MACIERZ POMYŁEK
-    # =========================================================
+
 
     mean_cm = np.mean(all_cms, axis=0)
 
@@ -203,12 +181,9 @@ def evaluate_all_folds():
     plt.savefig(mean_cm_path, dpi=300)
     plt.close()
 
-    print(f"\n✓ Zapisano średnią macierz pomyłek: {mean_cm_path}\n")
+    print(f"\n Zapisano średnią macierz pomyłek: {mean_cm_path}\n")
 
 
-    # =========================================================
-    # PODSUMOWANIE TXT (MEAN ± STD)
-    # =========================================================
 
     losses = [m["loss"] for m in all_metrics]
     accs = [m["accuracy"] for m in all_metrics]
