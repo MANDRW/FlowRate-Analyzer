@@ -53,7 +53,7 @@ class ModelBuilder:
             x = GlobalAveragePooling2D()(x)
             x = Dropout(0.4)(x)
             x = Dense(128, activation='relu')(x)
-            output = Dense(self.num_classes, activation='softmax')(x)
+            output = Dense(3, activation='softmax')(x)
 
             model = Model(inputs=base.input, outputs=output)
             model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
